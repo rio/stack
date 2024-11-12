@@ -1,0 +1,23 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  K3D_CLUSTER_NAME: k3s-default
+
+tasks:
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+  up:
+    status:
+      - k3d cluster get {{.K3D_CLUSTER_NAME}}
+    cmds:
+      - k3d cluster create --config ./k3d-config.yaml {{.K3D_CLUSTER_NAME}}
+      - kubectl wait --for condition=available -n kube-system deployment/coredns
+
+  down:
+    cmds:
+      - k3d cluster delete {{.K3D_CLUSTER_NAME}}
