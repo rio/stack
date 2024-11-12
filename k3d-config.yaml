@@ -1,0 +1,32 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+
+image: rancher/k3s:v1.31.1-k3s1
+
+volumes:
+  - volume: k3d-server-0-var-lib-rancher-k3s-agent-containerd:/var/lib/rancher/k3s/agent/containerd
+    nodeFilters:
+      - server:0
+
+ports:
+  - port: "80:80"
+    nodeFilters:
+      - loadbalancer
+  - port: "443:443"
+    nodeFilters:
+      - loadbalancer
+
+registries:
+  config: |
+    mirrors:
+      "*":
+
+options:
+  k3s:
+    extraArgs:
+      - arg: "--disable=traefik,metrics-server"
+        nodeFilters:
+          - server:*
+      - arg: "--embedded-registry"
+        nodeFilters:
+          - server:*
